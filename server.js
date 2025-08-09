@@ -154,18 +154,20 @@ app.put("/api/change-password", isLoggedIn, async (req, res) => {
 
 // PROFILE MANAGEMENT (Using UPSERT logic for simplicity)
 const handleProfileUpsert = async (req, res, table) => {
+    if (req.body.txtDob === '') {
+        req.body.txtDob = null;
+    }
+
     let fileName = req.body.hdn || '';
     if (req.files && req.files.ppic) {
         const pic = req.files.ppic;
         fileName = `${Date.now()}-${pic.name}`;
         const uploadPath = `${__dirname}/public/upload/${fileName}`;
-        // Use a promise to handle async file move
-        await new Promise((resolve, reject) => {
-            pic.mv(uploadPath, (err) => {
-                if (err) reject(new Error("File upload failed."));
-                resolve();
-            });
-        });
+        try {
+            await pic.mv(uploadPath);
+        } catch (err) {
+            return res.status(500).json({ success: false, message: "File upload failed." });
+        }
     }
 
     try {
@@ -174,7 +176,19 @@ const handleProfileUpsert = async (req, res, table) => {
                 INSERT INTO infprofile (email, iname, gender, dob, address, city, contact, field, insta, yt, other, "fileName")
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
                 ON CONFLICT (email) 
-                DO UPDATE SET iname = $2, gender = $3, dob = $4, address = $5, city = $6, contact = $7, field = $8, insta = $9, yt = $10, other = $11, "fileName" = $12`;
+                DO UPDATE SET 
+                    -- FIX 2: Use the more reliable EXCLUDED keyword for updates
+                    iname = EXCLUDED.iname,
+                    gender = EXCLUDED.gender,
+                    dob = EXCLUDED.dob,
+                    address = EXCLUDED.address,
+                    city = EXCLUDED.city,
+                    contact = EXCLUDED.contact,
+                    field = EXCLUDED.field,
+                    insta = EXCLUDED.insta,
+                    yt = EXCLUDED.yt,
+                    other = EXCLUDED.other,
+                    "fileName" = EXCLUDED."fileName"`;
             const params = [req.body.iemail, req.body.txtName, req.body.txtGender, req.body.txtDob, req.body.txtAdd, req.body.txtCity, req.body.txtContact, req.body.txtField.toString(), req.body.txtInsta, req.body.txtYt, req.body.txtOther, fileName];
             await pool.query(query, params);
         } else { // collaborator
@@ -182,7 +196,16 @@ const handleProfileUpsert = async (req, res, table) => {
                 INSERT INTO coprofile (email, iname, gender, dob, address, city, contact, insta, "fileName")
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 ON CONFLICT (email) 
-                DO UPDATE SET iname = $2, gender = $3, dob = $4, address = $5, city = $6, contact = $7, insta = $8, "fileName" = $9`;
+                DO UPDATE SET 
+                    -- FIX 2: Use the more reliable EXCLUDED keyword for updates
+                    iname = EXCLUDED.iname,
+                    gender = EXCLUDED.gender,
+                    dob = EXCLUDED.dob,
+                    address = EXCLUDED.address,
+                    city = EXCLUDED.city,
+                    contact = EXCLUDED.contact,
+                    insta = EXCLUDED.insta,
+                    "fileName" = EXCLUDED."fileName"`;
             const params = [req.body.iemail, req.body.txtName, req.body.txtGender, req.body.txtDob, req.body.txtAdd, req.body.txtCity, req.body.txtContact, req.body.txtInsta, fileName];
             await pool.query(query, params);
         }
