@@ -5,6 +5,7 @@ const { Pool } = require("pg"); // Use the 'pg' library for PostgreSQL
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
+const pgSession = require("connect-pg-simple")(session);
 require("dotenv").config(); // To load environment variables from .env file
 
 const app = express();
@@ -16,21 +17,26 @@ app.use(express.urlencoded({ extended: true }));
 app.use(fileuploader());
 
 // Session Middleware Setup
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
-}));
-
-// --- PostgreSQL Connection Pool ---
-// This is designed to work with Render's DATABASE_URL environment variable.
+// --- PostgreSQL Connection Pool --- (This should already be in your file)
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
-        rejectUnauthorized: false // This is required for Render database connections
+        rejectUnauthorized: false
     }
 });
+
+// Replace your old app.use(session(...)) with this entire block
+app.use(session({
+    store: new pgSession({
+        pool: pool,                // Your existing database connection pool
+        tableName: 'user_sessions' // The name for the new session table
+    }),
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // Session cookie lasts 30 days
+}));
+// --- PostgreSQL Connection Pool ---
 
 pool.connect((err) => {
     if (err) {
