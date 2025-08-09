@@ -43,8 +43,9 @@
                 <tbody>
                     <tr ng-repeat="profile in allProfiles">
                         <td>
-                            <img ng-src="upload/{{profile.fileName}}" width="80" height="80" class="rounded-circle object-fit-cover" alt="Profile Pic" ng-if="profile.fileName">
-                            <img ng-src="pics/pngtree-user-avatar-placeholder-black-png-image_3918427.jpg" width="80" height="80" class="rounded-circle" alt="Default Pic" ng-if="!profile.fileName">
+                            <td>
+                            <img ng-src="{{ (profile.fileName && profile.fileName.startsWith('http')) ? profile.fileName : 'pics/pngtree-user-avatar-placeholder-black-png-image_3918427.jpg' }}" width="80" height="80" class="rounded-circle object-fit-cover" alt="Profile Pic">
+                            </td>
                         </td>
                         <td>{{profile.email}}</td>
                         <td>{{profile.iname}}</td>
