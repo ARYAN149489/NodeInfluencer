@@ -43,9 +43,7 @@
                 <tbody>
                     <tr ng-repeat="profile in allProfiles">
                         <td>
-                            <td>
                             <img ng-src="{{ (profile.fileName && profile.fileName.startsWith('http')) ? profile.fileName : 'pics/pngtree-user-avatar-placeholder-black-png-image_3918427.jpg' }}" width="80" height="80" class="rounded-circle object-fit-cover" alt="Profile Pic">
-                            </td>
                         </td>
                         <td>{{profile.email}}</td>
                         <td>{{profile.iname}}</td>
