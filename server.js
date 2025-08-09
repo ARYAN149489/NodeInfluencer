@@ -216,9 +216,24 @@ const handleProfileUpsert = async (req, res, table) => {
     }
 };
 
-app.post("/api/influencer-profile", isLoggedIn, isInfluencer, (req, res) => handleProfileUpsert(req, res, 'infprofile'));
-app.post("/api/collaborator-profile", isLoggedIn, isCollaborator, (req, res) => handleProfileUpsert(req, res, 'coprofile'));
+// Replace the existing app.post lines for profiles with these:
+app.post("/api/influencer-profile", isLoggedIn, isInfluencer, async (req, res) => {
+    try {
+        await handleProfileUpsert(req, res, 'infprofile');
+    } catch (error) {
+        console.error("Critical error in /api/influencer-profile route:", error);
+        res.status(500).json({ success: false, message: "A critical server error occurred." });
+    }
+});
 
+app.post("/api/collaborator-profile", isLoggedIn, isCollaborator, async (req, res) => {
+    try {
+        await handleProfileUpsert(req, res, 'coprofile');
+    } catch (error) {
+        console.error("Critical error in /api/collaborator-profile route:", error);
+        res.status(500).json({ success: false, message: "A critical server error occurred." });
+    }
+});
 
 app.get("/api/profile/:email", isLoggedIn, async (req, res) => {
     const table = req.session.user.utype === 'Influencer' ? 'infprofile' : 'coprofile';

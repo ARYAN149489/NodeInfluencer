@@ -150,7 +150,15 @@
                         $('#form-message').text(response.message).addClass('alert alert-success');
                     },
                     error: function(xhr) {
-                         $('#form-message').text(xhr.responseJSON.message || 'An error occurred.').addClass('alert alert-danger');
+                        let errorMsg = 'An unknown server error occurred.'; // Default message
+                        // Check for a JSON response first
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            // Fallback for non-JSON errors (like HTML error pages from a hard crash)
+                            errorMsg = "Server returned an unexpected response. Please check the logs.";
+                        }
+                        $('#form-message').text(errorMsg).removeClass('alert-success').addClass('alert alert-danger');
                     }
                 });
             });
