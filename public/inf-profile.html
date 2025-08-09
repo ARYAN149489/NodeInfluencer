@@ -153,7 +153,7 @@
                         $("#txtYt").val(profile.yt);
                         $("#txtOther").val(profile.other);
                         $("#hdn").val(profile.fileName);
-                        if(profile.fileName) $("#imgprev").attr("src", "upload/" + profile.fileName);
+                        if(profile.fileName) $("#imgprev").attr("src", profile.fileName);
                         if(profile.field) $("#txtField").val(profile.field.split(","));
                     } else {
                         profileExists = false;

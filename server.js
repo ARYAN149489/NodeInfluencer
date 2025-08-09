@@ -8,13 +8,22 @@ const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 require("dotenv").config(); // To load environment variables from .env file
 
+
+const cloudinary = require('cloudinary').v2;
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+});
+
 const app = express();
 const saltRounds = 10; // For bcrypt password hashing
 
 // --- Middleware ---
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
-app.use(fileuploader());
+// Configure express-fileupload to use temporary files
+app.use(fileuploader({ useTempFiles: true }));
 
 // Session Middleware Setup
 // --- PostgreSQL Connection Pool --- (This should already be in your file)
@@ -158,55 +167,44 @@ const handleProfileUpsert = async (req, res, table) => {
         req.body.txtDob = null;
     }
 
-    let fileName = req.body.hdn || '';
+    let imageUrl = req.body.hdn || ''; // We will now store the full image URL
+
+    // Check if a new file was uploaded
     if (req.files && req.files.ppic) {
         const pic = req.files.ppic;
-        fileName = `${Date.now()}-${pic.name}`;
-        const uploadPath = `${__dirname}/public/upload/${fileName}`;
         try {
-            await pic.mv(uploadPath);
-        } catch (err) {
-            return res.status(500).json({ success: false, message: "File upload failed." });
+            // Upload the temporary file to Cloudinary
+            const result = await cloudinary.uploader.upload(pic.tempFilePath, {
+                folder: "promo-app-profiles" // Optional: organizes uploads in Cloudinary
+            });
+            imageUrl = result.secure_url; // Get the permanent, secure URL
+        } catch (error) {
+            console.error("Cloudinary upload error:", error);
+            return res.status(500).json({ success: false, message: "Image upload failed." });
         }
     }
 
     try {
+        // The rest of the function remains the same, but we save `imageUrl`
+        // instead of `fileName` into the "fileName" column.
         if (table === 'infprofile') {
             const query = `
                 INSERT INTO infprofile (email, iname, gender, dob, address, city, contact, field, insta, yt, other, "fileName")
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-                ON CONFLICT (email) 
-                DO UPDATE SET 
-                    -- FIX 2: Use the more reliable EXCLUDED keyword for updates
-                    iname = EXCLUDED.iname,
-                    gender = EXCLUDED.gender,
-                    dob = EXCLUDED.dob,
-                    address = EXCLUDED.address,
-                    city = EXCLUDED.city,
-                    contact = EXCLUDED.contact,
-                    field = EXCLUDED.field,
-                    insta = EXCLUDED.insta,
-                    yt = EXCLUDED.yt,
-                    other = EXCLUDED.other,
-                    "fileName" = EXCLUDED."fileName"`;
-            const params = [req.body.iemail, req.body.txtName, req.body.txtGender, req.body.txtDob, req.body.txtAdd, req.body.txtCity, req.body.txtContact, req.body.txtField.toString(), req.body.txtInsta, req.body.txtYt, req.body.txtOther, fileName];
+                ON CONFLICT (email) DO UPDATE SET 
+                    iname = EXCLUDED.iname, gender = EXCLUDED.gender, dob = EXCLUDED.dob, address = EXCLUDED.address,
+                    city = EXCLUDED.city, contact = EXCLUDED.contact, field = EXCLUDED.field, insta = EXCLUDED.insta,
+                    yt = EXCLUDED.yt, other = EXCLUDED.other, "fileName" = EXCLUDED."fileName"`;
+            const params = [req.body.iemail, req.body.txtName, req.body.txtGender, req.body.txtDob, req.body.txtAdd, req.body.txtCity, req.body.txtContact, req.body.txtField.toString(), req.body.txtInsta, req.body.txtYt, req.body.txtOther, imageUrl];
             await pool.query(query, params);
         } else { // collaborator
             const query = `
                 INSERT INTO coprofile (email, iname, gender, dob, address, city, contact, insta, "fileName")
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                ON CONFLICT (email) 
-                DO UPDATE SET 
-                    -- FIX 2: Use the more reliable EXCLUDED keyword for updates
-                    iname = EXCLUDED.iname,
-                    gender = EXCLUDED.gender,
-                    dob = EXCLUDED.dob,
-                    address = EXCLUDED.address,
-                    city = EXCLUDED.city,
-                    contact = EXCLUDED.contact,
-                    insta = EXCLUDED.insta,
-                    "fileName" = EXCLUDED."fileName"`;
-            const params = [req.body.iemail, req.body.txtName, req.body.txtGender, req.body.txtDob, req.body.txtAdd, req.body.txtCity, req.body.txtContact, req.body.txtInsta, fileName];
+                ON CONFLICT (email) DO UPDATE SET
+                    iname = EXCLUDED.iname, gender = EXCLUDED.gender, dob = EXCLUDED.dob, address = EXCLUDED.address,
+                    city = EXCLUDED.city, contact = EXCLUDED.contact, insta = EXCLUDED.insta, "fileName" = EXCLUDED."fileName"`;
+            const params = [req.body.iemail, req.body.txtName, req.body.txtGender, req.body.txtDob, req.body.txtAdd, req.body.txtCity, req.body.txtContact, req.body.txtInsta, imageUrl];
             await pool.query(query, params);
         }
         res.json({ success: true, message: "Profile saved successfully!" });

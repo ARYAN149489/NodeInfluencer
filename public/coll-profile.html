@@ -127,7 +127,7 @@
                         $("#txtContact").val(profile.contact);
                         $("#txtInsta").val(profile.insta);
                         $("#hdn").val(profile.fileName);
-                        if(profile.fileName) $("#imgprev").attr("src", "upload/" + profile.fileName);
+                        if(profile.fileName) $("#imgprev").attr("src", profile.fileName);
                     } else {
                         profileExists = false;
                     }
