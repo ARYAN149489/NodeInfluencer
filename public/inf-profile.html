@@ -142,7 +142,10 @@
                         const profile = data[0];
                         $("#txtName").val(profile.iname);
                         $("#txtGender").val(profile.gender);
-                        $("#txtDob").val(profile.dob);
+                        if (profile.dob) {
+                            const formattedDate = profile.dob.split('T')[0];
+                            $("#txtDob").val(formattedDate);
+                        }
                         $("#txtAdd").val(profile.address);
                         $("#txtCity").val(profile.city);
                         $("#txtContact").val(profile.contact);
