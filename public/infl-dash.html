@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Influencer Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div id="bg-overlay"></div>
+    <div id="wait-spinner"></div>
+
+    <nav class="navbar navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand"><i class="fa-solid fa-handshake"></i> promo.com</a>
+        <button class="btn btn-outline-danger" id="btnLogout">Logout</button>
+      </div>
+    </nav>
+    
+    <div id="infdash" class="dash-header"></div>
+    <div id="indash" class="text-center">DASHBOARD</div>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card text-center h-100">
+                    <img src="pics/computer-icons-user-profile-circle-abstract-449b748c464eba566641217282fff3a1.png" class="card-img-top mx-auto" alt="Profile">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">My Profile</h5>
+                        <p class="card-text">Create or update your public profile.</p>
+                        <a href="/inf-profile.html" class="btn btn-primary mt-auto">Manage Profile</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card text-center h-100">
+                     <img src="pics/image.png" class="card-img-top mx-auto" alt="Events">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Your Events</h5>
+                        <p class="card-text">View all your upcoming events.</p>
+                        <a href="/infl-events-page.html" class="btn btn-primary mt-auto">View Events</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card text-center h-100">
+                     <img src="pics/promotions.png" class="card-img-top mx-auto" alt="Add Event">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Add Event</h5>
+                        <p class="card-text">Post a new upcoming event.</p>
+                        <button type="button" class="btn btn-primary mt-auto" data-bs-toggle="modal" data-bs-target="#addEventModal">Add Upcoming Event</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card text-center h-100">
+                     <img src="pics/icons8-spinner.gif" class="card-img-top mx-auto" alt="Settings">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Settings</h5>
+                        <p class="card-text">Change your account password.</p>
+                        <button type="button" class="btn btn-primary mt-auto" data-bs-toggle="modal" data-bs-target="#settingsModal">Change Password</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addEventModal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Event</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="eventForm" class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Event Name</label>
+                <input type="text" class="form-control" id="btxtname" name="btxtname" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Date of Event</label>
+                <input type="date" class="form-control" id="btxtdate" name="btxtdate" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Start Time</label>
+                <input type="time" class="form-control" id="btime" name="btime" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" id="btxtcity" name="btxtcity" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Venue</label>
+                <input type="text" class="form-control" id="btxtvenue" name="btxtvenue" required>
+              </div>
+              <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary w-100">Post Event</button>
+              </div>
+            </form>
+          </div>
+           <div class="modal-footer">
+                <span id="errspan">*</span>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="settingsModal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Change Password</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="changePasswordForm" class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Old Password</label>
+                <input type="password" class="form-control" id="opwd" name="opwd" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-control" id="npwd" name="npwd" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" class="form-control" id="nPwd" required>
+              </div>
+              <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary w-100">Change Password</button>
+              </div>
+            </form>
+          </div>
+           <div class="modal-footer">
+                <span id="errspan2">*</span>
+           </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      $(document).ready(function(){
+        let activeUserEmail = '';
+
+        // Check login status and set welcome message
+        $.get("/api/current-user").done(function(response) {
+            if (response.success && response.user) {
+                activeUserEmail = response.user.email;
+                $("#infdash").html("Welcome " + activeUserEmail);
+            }
+        }).fail(function() {
+            location.href = "/";
+        });
+
+        // AJAX loading spinner
+        $(document).ajaxStart(() => $("#bg-overlay, #wait-spinner").fadeIn(200));
+        $(document).ajaxStop(() => $("#bg-overlay, #wait-spinner").fadeOut(200));
+
+        // Logout
+        $("#btnLogout").click(() => $.post("/api/logout", () => location.href = "/"));
+
+        // Event posting
+        $("#eventForm").submit(function(e) {
+            e.preventDefault();
+            $("#errspan").text("");
+            $.ajax({
+                url: "/api/events",
+                method: "POST",
+                data: $(this).serialize()
+            }).done(function(res) {
+                $("#errspan").text(res.message).css("color", "green");
+                $("#eventForm")[0].reset();
+                setTimeout(() => $('#addEventModal').modal('hide'), 2000);
+            }).fail(function(xhr) {
+                $("#errspan").text(xhr.responseJSON.message || "Failed to post.").css("color", "red");
+            });
+        });
+
+        // Change password
+        $("#changePasswordForm").submit(function(e) {
+            e.preventDefault();
+            $("#errspan2").text("");
+            const newPassword = $("#npwd").val();
+            const confirmPassword = $("#nPwd").val();
+            if (newPassword !== confirmPassword) {
+                $("#errspan2").text("New passwords do not match.").css("color", "red");
+                return;
+            }
+
+            $.ajax({
+                url: "/api/change-password",
+                method: "PUT",
+                data: { opwd: $("#opwd").val(), npwd: newPassword }
+            }).done(function(res) {
+                 $("#errspan2").text(res.message).css("color", "green");
+                 $("#changePasswordForm")[0].reset();
+                 setTimeout(() => $('#settingsModal').modal('hide'), 2000);
+            }).fail(function(xhr) {
+                $("#errspan2").text(xhr.responseJSON.message || "Failed.").css("color", "red");
+            });
+        });
+      });
+    </script>
+</body>
+</html>

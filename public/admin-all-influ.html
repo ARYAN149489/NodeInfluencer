@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - All Influencers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body ng-app="influencerApp" ng-controller="influencerController" ng-init="fetchAllProfiles()">
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand"><i class="fa-solid fa-handshake"></i> promo.com</a>
+            <div>
+                <a href="/admin-dash.html" class="btn btn-secondary">Back to Dashboard</a>
+                <button class="btn btn-outline-danger" id="btnLogout">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="indash" class="text-center">INFLUENCER CONSOLE</div>
+
+    <div class="container-fluid mt-4">
+        <h3 class="mb-3">All Influencer Profiles</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Pic</th>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>City</th>
+                        <th>Fields</th>
+                        <th>Instagram</th>
+                        <th>YouTube</th>
+                        <th>DOB</th>
+                        <th>Gender</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="profile in allProfiles">
+                        <td>
+                            <img ng-src="upload/{{profile.fileName}}" width="80" height="80" class="rounded-circle object-fit-cover" alt="Profile Pic" ng-if="profile.fileName">
+                            <img ng-src="pics/pngtree-user-avatar-placeholder-black-png-image_3918427.jpg" width="80" height="80" class="rounded-circle" alt="Default Pic" ng-if="!profile.fileName">
+                        </td>
+                        <td>{{profile.email}}</td>
+                        <td>{{profile.iname}}</td>
+                        <td>{{profile.contact}}</td>
+                        <td>{{profile.city}}</td>
+                        <td>{{profile.field}}</td>
+                        <td><a href="https://instagram.com/{{profile.insta}}" target="_blank">{{profile.insta}}</a></td>
+                        <td><a href="{{profile.yt}}" target="_blank">Channel</a></td>
+                        <td>{{profile.dob}}</td>
+                        <td>{{profile.gender}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#btnLogout").click(function() {
+                $.ajax({ url: "/api/logout", method: "POST" }).done(() => location.href = "/");
+            });
+        });
+
+        var app = angular.module('influencerApp', []);
+        app.controller('influencerController', function($scope, $http) {
+            $scope.allProfiles = [];
+            $scope.fetchAllProfiles = function() {
+                $http.get("/api/admin/influencer-profiles").then(function(response) {
+                    $scope.allProfiles = response.data;
+                }, function(error) {
+                    if(error.status === 403 || error.status === 401) location.href = "/adminpage.html";
+                    else alert("Failed to fetch influencer profiles.");
+                });
+            };
+        });
+    </script>
+</body>
+</html>

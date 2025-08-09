@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborator Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div id="bg-overlay"></div>
+    <div id="wait-spinner"></div>
+    
+    <nav class="navbar navbar-light bg-light">
+      <div class="container-fluid">
+          <a class="navbar-brand"><i class="fa-solid fa-handshake"></i> promo.com</a>
+          <div>
+            <a href="/collaborator-dash.html" class="btn btn-secondary">Back to Dashboard</a>
+            <button class="btn btn-outline-danger" id="btnLogout">Logout</button>
+          </div>
+      </div>
+    </nav>
+    
+    <div id="infdash" class="dash-header"></div>
+    <div id="indash" class="text-center">MANAGE PROFILE</div>
+
+    <div class="container my-4">
+        <div class="profile-form-container">
+            <form id="profileForm" class="row g-3">
+                <div class="col-md-8">
+                  <label for="iemail" class="form-label">Email</label>
+                  <input type="email" class="form-control" name="iemail" id="iemail" readonly>
+                </div>
+                <div class="col-md-4 text-center">
+                    <img src="pics/pngtree-user-avatar-placeholder-black-png-image_3918427.jpg" id="imgprev" class="profile-pic-preview" alt="Profile Preview">
+                    <input type="file" class="form-control form-control-sm mt-2" id="ppic" name="ppic" onchange="previewImage(this, 'imgprev')">
+                    <input type="hidden" id="hdn" name="hdn">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Name / Company Name</label>
+                    <input type="text" required class="form-control" name="txtName" id="txtName">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Gender</label>
+                    <select id="txtGender" name="txtGender" class="form-select" required>
+                        <option value="" disabled selected>Select</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" required class="form-select" id="txtDob" name="txtDob">
+                </div>
+                
+                <div class="col-md-8">
+                  <label class="form-label">Address</label>
+                  <input type="text" required class="form-control" id="txtAdd" name="txtAdd">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">City</label>
+                  <input type="text" required class="form-control" id="txtCity" name="txtCity">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Contact No</label>
+                    <input type="text" required class="form-control" id="txtContact" name="txtContact">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Instagram Username (Optional)</label>
+                    <input type="text" class="form-control" id="txtInsta" name="txtInsta" placeholder="e.g., your_username">
+                </div>
+                
+                <div class="col-12 text-center mt-4">
+                  <div id="form-message" class="mb-3"></div>
+                  <button type="submit" class="btn btn-primary w-50">Save / Update Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        let activeUserEmail = '';
+        let profileExists = false;
+
+        function previewImage(input, previewId) {
+            const [file] = input.files;
+            if (file) {
+                document.getElementById(previewId).src = URL.createObjectURL(file);
+            }
+        }
+
+        $(document).ready(function() {
+            // AJAX loading spinner
+            $(document).ajaxStart(() => $("#bg-overlay, #wait-spinner").fadeIn(200));
+            $(document).ajaxStop(() => $("#bg-overlay, #wait-spinner").fadeOut(200));
+
+            // Logout
+            $("#btnLogout").click(() => $.post("/api/logout", () => location.href = "/"));
+            
+            // Get current user and fetch profile
+            $.get("/api/current-user").done(function(response) {
+                if (response.success && response.user) {
+                    activeUserEmail = response.user.email;
+                    $("#iemail").val(activeUserEmail);
+                    $("#infdash").html("Welcome " + activeUserEmail);
+                    fetchProfile(activeUserEmail);
+                }
+            }).fail(() => location.href = "/");
+
+            function fetchProfile(email) {
+                $.get("/api/profile/" + email).done(function(data) {
+                    if (data.length > 0) {
+                        profileExists = true;
+                        const profile = data[0];
+                        $("#txtName").val(profile.iname);
+                        $("#txtGender").val(profile.gender);
+                        $("#txtDob").val(profile.dob);
+                        $("#txtAdd").val(profile.address);
+                        $("#txtCity").val(profile.city);
+                        $("#txtContact").val(profile.contact);
+                        $("#txtInsta").val(profile.insta);
+                        $("#hdn").val(profile.fileName);
+                        if(profile.fileName) $("#imgprev").attr("src", "upload/" + profile.fileName);
+                    } else {
+                        profileExists = false;
+                    }
+                });
+            }
+
+            $("#profileForm").submit(function(e) {
+                e.preventDefault();
+                $('#form-message').text('').removeClass('alert alert-success alert-danger');
+                
+                const formData = new FormData(this);
+                const url = profileExists ? "/api/collaborator-profile" : "/api/collaborator-profile";
+                const method = profileExists ? "PUT" : "POST";
+
+                 $.ajax({
+                    url: url,
+                    method: method,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        profileExists = true;
+                        $('#form-message').text(response.message).addClass('alert alert-success');
+                    },
+                    error: function(xhr) {
+                         $('#form-message').text(xhr.responseJSON.message || 'An error occurred.').addClass('alert alert-danger');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

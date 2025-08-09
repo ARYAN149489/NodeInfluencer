@@ -1,0 +1,177 @@
+/* --- Global & General Styling --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand i {
+    color: #0d6efd;
+    font-size: 1.5rem;
+    vertical-align: middle;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+/* --- Utility & Helper Classes --- */
+#wait-spinner {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-image: url(../pics/icons8-spinner.gif);
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 1060; /* Higher than modal backdrop */
+    display: none;
+}
+
+#bg-overlay {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1056; /* Just below the spinner */
+}
+
+/* --- Dashboard Headers --- */
+.dash-header {
+    color: white;
+    height: 45px;
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+#infdash { background-color: #0d6efd; }
+#indash { background-color: #198754; height: 55px; padding-top: 12px; font-size: 1.5rem; font-weight: 600; text-transform: uppercase;}
+
+/* --- Cards --- */
+.dashboard-card {
+    margin: 20px auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 8px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-card img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin-top: 20px;
+    border-radius: 50%;
+    border: 3px solid #dee2e6;
+}
+
+.card .btn {
+    width: 80%;
+}
+
+/* --- Modals --- */
+.modal-header {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.modal-body .form-label {
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.modal-footer {
+    justify-content: center !important;
+}
+
+#errspan, #errspan2, #login-error, #signup-error {
+    color: #dc3545;
+    font-weight: 500;
+    min-height: 24px;
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* --- Profile Forms (inf-profile, coll-profile) --- */
+.profile-form-container {
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.profile-form-container .form-label {
+    font-weight: 500;
+}
+
+.profile-pic-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #dee2e6;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+/* --- Admin & Event Tables --- */
+.table {
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+.table thead {
+    background-color: #343a40;
+    color: white;
+}
+.table td, .table th {
+    vertical-align: middle;
+}
+
+/* Admin Page Specific */
+.admin-login-panel {
+    max-width: 450px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.admin-login-panel img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+.admin-login-panel .form-control {
+    border: none;
+    border-bottom: 2px solid #ced4da;
+    border-radius: 0;
+    padding-left: 0;
+}
+
+.admin-login-panel .form-control:focus {
+    box-shadow: none;
+    border-color: #0d6efd;
+}
