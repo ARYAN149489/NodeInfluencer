@@ -175,7 +175,7 @@
                 
                 const formData = new FormData(this);
                 const url = profileExists ? "/api/influencer-profile" : "/api/influencer-profile";
-                const method = profileExists ? "PUT" : "POST";
+                const method = "POST";
 
                 // For PUT requests with file uploads, we need to manually create the query string
                 // as jQuery's AJAX doesn't handle FormData with PUT well without extra configuration.
