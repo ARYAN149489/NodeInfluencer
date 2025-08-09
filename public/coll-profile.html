@@ -127,7 +127,14 @@
                         $("#txtContact").val(profile.contact);
                         $("#txtInsta").val(profile.insta);
                         $("#hdn").val(profile.fileName);
-                        if(profile.fileName) $("#imgprev").attr("src", profile.fileName);
+                        // Logic to handle both new Cloudinary URLs and old filenames
+                        if (profile.fileName && profile.fileName.startsWith('http')) {
+                            // If it's a full URL from Cloudinary, use it
+                            $("#imgprev").attr("src", profile.fileName);
+                        } else {
+                            // Otherwise, it's an old record or no picture, so use the default placeholder
+                            $("#imgprev").attr("src", "pics/pngtree-user-avatar-placeholder-black-png-image_3918427.jpg");
+                        }
                     } else {
                         profileExists = false;
                     }

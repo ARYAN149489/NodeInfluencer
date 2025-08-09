@@ -58,7 +58,7 @@
         </div>
         <div class="col-md-4 col-lg-3 mb-4" ng-repeat="profile in searchResults">
           <div class="card dashboard-card text-center h-100">
-            <img ng-src="upload/{{profile.fileName || 'default.png'}}" class="card-img-top mx-auto" alt="Profile Pic">
+            <img ng-src="{{ (profile.fileName && profile.fileName.startsWith('http')) ? profile.fileName : 'pics/pngtree-user-avatar-placeholder-black-png-image_3918427.jpg' }}" class="card-img-top mx-auto" alt="Profile Pic">
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">{{profile.iname}}</h5>
               <p class="card-text text-muted">{{profile.city}}</p>
